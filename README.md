@@ -14,15 +14,15 @@ example:
 
 g++ *.cpp -Wno-return-type-c-linkage -I /usr/local/Cellar/eigen/3.2.8/include/eigen3/  -o a  -I /usr/local/include/ -lmgl -std=gnu++11
 
-Finally you can use out to run the code. there is a number of options:
+Finally you can use the 'out' to run the code. There is a number of options:
 
--fa <filepath> : the fasta file to be processed by MLBP_BIN
+-fa <filepath> : the fasta file to be processed by MrGBP
 
 -svdd <dim> : the SVD dimension, default: 60
 
 -mlbpn <dim> : the MLBP window length, default: 8
 
--outdir <filepath> : a directory that all the MLBP_BIN results will be saved including cluster labels and .png figure
+-outdir <filepath> : a directory that all the MrGBP results will be saved including cluster labels and .png figure
 
 -no_clust <num> : the number of clusters for kmeans++, default: 10
 
@@ -54,7 +54,6 @@ examples:
 3. run using coverage profile
 
 ./out -fa /pathtofile/file.fa -covpm /pathtofile/cpm -covpstd /pathtofile/cpstd
-
 
 Codes for kmeans++ and dbsacan have been downloaded and modified to match our code:
 kmeans++: http://rosettacode.org/wiki/K-means%2B%2B_clustering
