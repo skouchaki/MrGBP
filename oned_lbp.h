@@ -24,7 +24,7 @@ public:
     {
         hist->clear();
         for (int i=0;i<(int)pow(2,segsize-1);i++)
-            hist->push_back(1);
+            hist->push_back(0);
         float tmp[segsize];
 
         for (int j=0;j<y;j++)
@@ -39,7 +39,7 @@ public:
         }
 
         for (int i=0;i<pow(2,segsize-1);i++)
-            hist->at(i)=log10(hist->at(i)/((x-segsize)*y));
+            hist->at(i)=(hist->at(i)/((x-segsize)*y));
     }
     int cal_hist(float tmp[],int segsize)
     {

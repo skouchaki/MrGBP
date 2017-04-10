@@ -27,23 +27,22 @@
 #include "factorisation.h"
 #include "tsne.h"
 #include "kmeanspp.h"
-#include "nt2aa.h"
 #include "dbscan.h"
 
 
 //saving BH-tSNe as .png file
-int sample(mglGraph *gr,double *a,int dim,std::vector <int> id,int k)
+int sample(mglGraph *gr,double *a,int dim,std::vector <int> id,int k,int no_dims)
 {
     
     mglData x;
     mglData y;
-    
+    mglData z;
     double * y1=new double [dim];
     double min=100000;
     double max=-100000;
     for (int i=0;i<dim;i++)
     {
-        y1[i]=a[2*i];
+        y1[i]=a[no_dims*i];
         if(y1[i]>max)
             max=y1[i];
         else if(y1[i]<=min)
@@ -58,7 +57,7 @@ int sample(mglGraph *gr,double *a,int dim,std::vector <int> id,int k)
     
     for (int i=0;i<dim;i++)
     {
-        y1[i]=a[2*i+1];
+        y1[i]=a[no_dims*i+1];
         if(y1[i]>max)
             max=y1[i];
         else if(y1[i]<=min)
@@ -67,20 +66,36 @@ int sample(mglGraph *gr,double *a,int dim,std::vector <int> id,int k)
     y.Set(y1,dim);
     gr->SetRange('y', min-1, max+1);
     
+    if(no_dims==3)
+    {
+        min=100000;
+        max=-100000;
+        
+        for (int i=0;i<dim;i++)
+        {
+            y1[i]=a[no_dims*i+1];
+            if(y1[i]>max)
+                max=y1[i];
+            else if(y1[i]<=min)
+                min=y1[i];
+        }
+        z.Set(y1,dim);
+        gr->SetRange('z', min-1, max+1);
+    }
     gr->SetOrigin(0,0,0);
     gr->SetFontSize(2);
-    gr->SubPlot(2,1,0,"");  gr->Title("Visualisation");
-    gr->Box();  gr->Plot(x,y," .");
+    gr->SubPlot(2,1,0,"");  gr->Title("Visualisation"); if(no_dims==3)gr->Rotate(60,40);
+    gr->Box();  if(no_dims==3) gr->Plot(x,y,z," .");else  gr->Plot(x,y," .");
     
     //color printing
-    gr->SubPlot(2,1,1,"");  gr->Title("Cluster Labels  Visualisation");
+    gr->SubPlot(2,1,1,"");  gr->Title("Cluster Labels  Visualisation");if(no_dims==3)gr->Rotate(60,40);
     for (int j=0;j<=k;j++)
     {
         int s=0;
         for (int i=0;i<dim;i++)
             if(id[i]==j)
             {
-                y1[s]=a[2*i];
+                y1[s]=a[no_dims*i];
                 s=s+1;
             }
         x.Set(y1,s);
@@ -89,20 +104,36 @@ int sample(mglGraph *gr,double *a,int dim,std::vector <int> id,int k)
         for (int i=0;i<dim;i++)
             if(id[i]==j)
             {
-                y1[s]=a[2*i+1];
+                y1[s]=a[no_dims*i+1];
                 s=s+1;
             }
         y.Set(y1,s);
 
+        if(no_dims==3)
+        {
+            s=0;
+            for (int i=0;i<dim;i++)
+                if(id[i]==j)
+                {
+                    y1[s]=a[no_dims*i+1];
+                    s=s+1;
+                }
+            z.Set(y1,s);
+
+        }
+        
         if(j==0)
              gr->Box();
-         gr->Plot(x,y," .");
+        if(no_dims==3)
+         gr->Plot(x,y,z," .");
+        else
+            gr->Plot(x,y," .");
     }
     return 0;
 }
 
 //used to find the coverage informtion of each file if the file provided
-void find_infile(std::string file, std::string name,std::vector <std::string> *record)
+string find_infile(std::string file, std::string name,std::vector <std::string> *record)
 {
     std::string s;
     int flag=0;
@@ -135,34 +166,39 @@ void find_infile(std::string file, std::string name,std::vector <std::string> *r
         {
             record->push_back("0");
         }
+        return "0";
     }
     else
     {
+      //  std::cout<<record1[1]<<std::endl;
         for (int i=1;i<record1.size();i++)
         {
             record->push_back(record1[i]);
         }
-
+        return record1[1];
     }
     myfile.close();
 }
 
 int main(int argc, const char * argv[])
 {
+    int k=0;
+ //   std::map<std::string, int> ids;
+ //   std::vector <int> nnlen;
+    
     std::string name;
     std::string cpname,cpname1;
     std::string out="tsne_results1";
     std::string dire;
     
     std::string femethod = "n_LBP";
-    std::string repsmethod = "EIIP";
+    std::string repsmethod = "Integer";
     int repsdim=1;
-    int lev=8;
+    int lev=6;
     int dd=60;
     int nparts=10;
     float dbep=0.02;
     int dbminpt=8;
-    
     std::vector <std::string> ndata;
     std::vector <std::string> uids;
     
@@ -173,6 +209,10 @@ int main(int argc, const char * argv[])
     int flag4=1;
     int flag5=0;
     int maxs=1000;
+    
+    int no_dims=2;
+    int perplexity=40;
+    double theta=0.5;
     
     //loop to get information from cmd
     int iii=1;
@@ -261,6 +301,12 @@ int main(int argc, const char * argv[])
             flag5=1;
             iii=iii+1;
         }
+        else if ((std::string)(argv[iii]) == "-no_dims")//num of dimensions (BH-tsne)
+        {
+            no_dims=atoi(argv[iii + 1]);
+            iii=iii+2;
+        }
+        
     }
     
     if(flag1==0)//if not out dir indicated it makes one
@@ -284,22 +330,24 @@ int main(int argc, const char * argv[])
       //  std::size_t found1;
         std::vector <std::vector <float>> features;
         
-        int k = 1;
-        std::vector <int> id;
-        std::vector <int> lens;
+  //      int k = 1;
+  //      std::vector <int> id;
+  //      std::vector <int> lens;
         int *lenn=new int(0);
         
         //loop for extracting features
         t1=clock();
-        std::string line;
-        std::ifstream myfile (cpname.c_str());
-        std::ifstream myfile1 (cpname1.c_str());
+   //     std::string line;
+   //     std::ifstream myfile (cpname.c_str());
+   //     std::ifstream myfile1 (cpname1.c_str());
         std::vector <std::string> record;
         for (int i=0;i<ndata.size();i++) //for all the contigs
         {
             if(ndata[i].size()>=maxs)//only long contigs
             {
+                
                 ndata[i].erase(std::remove(ndata[i].begin(), ndata[i].end(), 'N'), ndata[i].end());
+            //    nnlen.push_back(ndata[i].size());
                 record.clear();
                 if(flag2==1)
                 {
@@ -313,10 +361,39 @@ int main(int argc, const char * argv[])
                 fe.extract(femethod, &repsn,ndata[i], lenn[0], repsdim, &features,lev,record);
                 ndata[i]="";
                 repsn.clear();
+                record.clear();
+                
+    /*            record.clear();
+                std::string nn = find_infile("/Users/samaneh/Downloads/bowtie2-2.2.9/simulated_data/100s.spe.txt", uids[i],&record);
+                //for (int i=0;i<record.size();i++)
+            //    std::cout<<nn<<", "<<uids[i]<<std::endl;
+                //    std::cout<<std::endl;
+                //std::cout<<i<<std::endl;
+                if(ids.count(nn)==0)
+                {
+                    std::cout<<nn<<std::endl;
+                    ids[nn]=k;
+                    k++;
+                }
+                auto search = ids.find(nn);
+                id.push_back(search->second);*/
+                
             }
         }
         std::cout<<"feature selectiom times: "<<(float)(clock()-t1)/CLOCKS_PER_SEC<<std::endl;
         
+       /* std::ofstream myfi ("/Users/samaneh/Downloads/bowtie2-2.2.9/simulated_data/labs100.txt");
+        if (myfi.is_open())
+        {
+            for (int i=0;i<id.size();i++)
+            {
+                myfi << id[i] <<" "<< nnlen[i] << "\n";
+            }
+            myfi.close();
+        }
+        id.clear();
+        nnlen.clear();
+        std::cout<<ids["0"]<<std::endl;*/
         
         free(rn);
         free(lenn);
@@ -354,9 +431,6 @@ int main(int argc, const char * argv[])
         std::cout<<"svd time: "<<(float)(clock()-t1)/CLOCKS_PER_SEC<<std::endl;
         
         //bh-tsne
-        int no_dims=2;
-        int perplexity=40;
-        double theta=0.5;
         int dimx=(int)trans.size();
         int dim=dd;
         double* Y = (double*) malloc(dimx* no_dims * sizeof(double));
@@ -415,14 +489,14 @@ int main(int argc, const char * argv[])
             mglGraph gr;
             gr.Alpha(true);
             gr.Light(true);
-            sample(&gr,Y,dimx,cen,nparts); // The same drawing function.
+            sample(&gr,Y,dimx,cen,nparts,no_dims); // The same drawing function.
             out=dire+"/"+"figure1.png";
             gr.WritePNG(out.c_str());  // Don't forget to save the result!
         }
         else
         {
         
-            clustering::DBSCAN::ClusterData cl_d = clustering::DBSCAN::gen_cluster_data( 2, dimx,Y );
+            clustering::DBSCAN::ClusterData cl_d = clustering::DBSCAN::gen_cluster_data( no_dims, dimx,Y );
             clustering::DBSCAN db(dbep,dbminpt,1);
         
             db.fit( cl_d );
@@ -445,7 +519,7 @@ int main(int argc, const char * argv[])
             mglGraph gr;
             gr.Alpha(true);
             gr.Light(true);
-            sample(&gr,Y,dimx,labs,nparts); // The same drawing function.
+            sample(&gr,Y,dimx,labs,nparts,no_dims); // The same drawing function.
             out=dire+"/"+"figure1.png";
             gr.WritePNG(out.c_str());  // Don't forget to save the result!
         }

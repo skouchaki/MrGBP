@@ -29,6 +29,7 @@ public:
         std::cout<<"-dbep <num> : indicate the epsilon for dbscan, default: 0.02"<<std::endl;
         std::cout<<"-dbminpt <num> : indicate the number of minimum neighbouring points for dbscan, default: 8"<<std::endl;
         std::cout<<"-save_feat : If the features needs to be saved separately"<<std::endl;
+        std::cout<<"-no_dims : bh-tSNE dimensions, defualt: 2"<<std::endl;
     }
     
 };

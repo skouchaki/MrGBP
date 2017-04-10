@@ -9,7 +9,6 @@
 #ifndef feature_extraction_h
 #define feature_extraction_h
 
-#include "fft.h"
 #include "oned_lbp.h"
 
 #include <math.h>

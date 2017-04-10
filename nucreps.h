@@ -1,7 +1,7 @@
 //
 //  nucreps.h
 //  cluster_matagenom_nt2aa
-//
+// numerically represent data
 //  Created by Samaneh Kouchaki on 25/05/2016.
 //  Copyright © 2016 Samaneh Kouchaki. All rights reserved.
 //

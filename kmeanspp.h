@@ -168,7 +168,10 @@ void save_labels(point pts, int len, std::string name, std::vector <int> *ind, s
     {
         tmp.clear();
         copy((final[j]).begin(),final[j].end(),back_inserter(tmp));
-        std::string name1=name+static_cast<ostringstream*>( &(ostringstream() << j) )->str();
+        stringstream ss;
+        ss << j;
+        string str = ss.str();
+        std::string name1=name+str;//static_cast<ostringstream*>( &(ostringstream() << j) )->str();
         std::ofstream myfile (name1);
         for (int k=0;k<tmp.size();k++)
         {

@@ -17,7 +17,7 @@
 
 using namespace std;
 namespace clustering {
-    DBSCAN::ClusterData DBSCAN::gen_cluster_data( size_t features_num, size_t elements_num ,double* data)
+    DBSCAN::ClusterData DBSCAN::gen_cluster_data( size_t features_num, size_t elements_num ,double* data)//load data for clustering
 {
     DBSCAN::ClusterData cl_d( elements_num, features_num );
 
@@ -232,7 +232,8 @@ const DBSCAN::Labels& DBSCAN::get_labels() const
 {
     return m_labels;
 }
-    
+ 
+    //save clusters
 int DBSCAN::save_labels(std::string name, std::vector <std::string> ndata, std::vector <std::string> uid,std::vector <int>* ind, double * data)
 {
     std::vector <std::vector <int>> final;
@@ -255,10 +256,10 @@ int DBSCAN::save_labels(std::string name, std::vector <std::string> ndata, std::
     
     std::ofstream myfile (name);
     
-    std::vector <double> cen;
-    std::vector <int> ss;
+  //  std::vector <double> cen;
+  //  std::vector <int> ss;
     
-    for(int i=0;i<=2*mm+1;i++)
+/*    for(int i=0;i<=2*mm+1;i++)
     {
         cen.push_back(0);
         ss.push_back(0);
@@ -277,18 +278,18 @@ int DBSCAN::save_labels(std::string name, std::vector <std::string> ndata, std::
     for (int i=0;i<cen.size();i++)
         cen[i]/=ss[i];
 
-    ss.clear();
+    ss.clear();*/
     for (int j=0;j<ind->size();j++)
     {
         if(ind->at(j)>=0)
             final[ind->at(j)].push_back(j);
-        else
+      /*  else
         {
             double mind=1000000;
             int mini=-1;
             for (int i=0;i<=mm;i++)
             {
-                double dist=(data[j*2+1]-cen[i*2+1])*(data[j*2+1]-cen[i*2+1])+(data[j*2]-cen[i*2])*(data[j*2]-cen[i*2]);
+                double dist=sqrt((data[j*2+1]-cen[i*2+1])*(data[j*2+1]-cen[i*2+1])+(data[j*2]-cen[i*2])*(data[j*2]-cen[i*2]));
                 if(dist<mind)
                 {
                     mind=dist;
@@ -298,17 +299,20 @@ int DBSCAN::save_labels(std::string name, std::vector <std::string> ndata, std::
             ind->at(j)=mini;
             if(mini>=0)
                 final[ind->at(j)].push_back(j);
-        }
+        }*/
         myfile<<ind->at(j)<<", ";
     }
     myfile.close();
     
-    cen.clear();
+ //   cen.clear();
     for (int j=0;j<final.size();j++)
     {
         tmp.clear();
         copy((final[j]).begin(),final[j].end(),back_inserter(tmp));
-        std::string name1=name+static_cast<ostringstream*>( &(ostringstream() << j) )->str();
+        stringstream ss;
+        ss << j;
+        string str = ss.str();
+        std::string name1=name+str;//static_cast<ostringstream*>( &(ostringstream() << j) )->str();
         std::ofstream myfile (name1);
         for (int k=0;k<tmp.size();k++)
         {

@@ -1,7 +1,7 @@
 //
 //  load.h
 //  cluster_matagenom_nt2aa
-//
+//  load fasta file
 //  Created by Samaneh Kouchaki on 10/05/2016.
 //  Copyright © 2016 Samaneh Kouchaki. All rights reserved.
 //
@@ -72,22 +72,8 @@ public:
                 //1. save previous read
                 if(i>0 )
                 {
-                    std::size_t found = uid.find("complement");
-                    if (found==std::string::npos)
-                    {
                         ndata->push_back(read);
                         uids->push_back(uid);
-                    }
-                    else
-                    {
-                        read=reverse_com(read);
-                        read.erase(std::remove(read.begin(), read.end(), 'N'), read.end());
-                        if(read.size()>=1000)
-                        {
-                        ndata->push_back(read);
-                        uids->push_back(uid);
-                        }
-                    }
                 }
                 i++;
                 //2. new id

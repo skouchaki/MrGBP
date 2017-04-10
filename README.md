@@ -1,28 +1,37 @@
-The code needs the following dependencies:
+program name: MrGBP
+version: 1.0
+Developer: Samaneh Kouchaki (kouchaki.samaneh@gmail.com)
+
+
+========instalation guide
+(1) Install the following dependencies
 
 eigen3: http://eigen.tuxfamily.org/index.php?title=Main_Page
-
 boost: http://www.boost.org/doc/libs/1_62_0/more/getting_started/unix-variants.html
-
 methgl: http://mathgl.sourceforge.net/doc_en/Installation.html
 
-After installing the dependencies the object file can be make using:
+(2) run: make
 
-g++ *.cpp -Wno-return-type-c-linkage -I <path to eigeb3> -o out -I <path to mathgl> -lmgl -std=gnu++11
+(3) code is ready to use
 
-example:
 
-g++ *.cpp -Wno-return-type-c-linkage -I /usr/local/Cellar/eigen/3.2.8/include/eigen3/  -o a  -I /usr/local/include/ -lmgl -std=gnu++11
+========whtat does the code do:
+It is for binning metagenomic contigs.
 
-Finally you can use the 'out' to run the code. There is a number of options:
+========support platform
+MrGBP has been tested on Mac os but should run on linux platorm without any problem.
 
--fa <filepath> : the fasta file to be processed by MrGBP
+
+========run 
+There is a number of options:
+
+-fa <filepath> : the fasta file to be processed by MLBP_BIN
 
 -svdd <dim> : the SVD dimension, default: 60
 
 -mlbpn <dim> : the MLBP window length, default: 8
 
--outdir <filepath> : a directory that all the MrGBP results will be saved including cluster labels and .png figure
+-outdir <filepath> : a directory that all the MLBP_BIN results will be saved including cluster labels and .png figure
 
 -no_clust <num> : the number of clusters for kmeans++, default: 10
 
@@ -30,7 +39,7 @@ Finally you can use the 'out' to run the code. There is a number of options:
 
 -covpstd <num> : a file contains standard deviation coverage depth
 
--reps <method> : the numerical mapping including EIIP, Real, Integer, Paired, Atomic, default: EIIP
+-reps <method> : the numerical mapping including EIIP, Real, Integer, Paired, Atomic, default: Integer
 
 -clust <method> : the clustering method kmeans++ or dbscan: dbscan
 
@@ -40,20 +49,23 @@ Finally you can use the 'out' to run the code. There is a number of options:
 
 -save_feat : If the features needs to be saved separately.
 
+-no_dims : bh-tSNE dimensions, defualt: 2.
+
 examples: 
 
 1. Running with default option on a fasta file indicated by the path and save the results in desired directory
 
-./out -fa /pathtofile/file.fa -outdir /pathtofile/file.fa
+./MrGBP -fa /pathtofile/file.fa -outdir /pathtofile/file.fa
 
 
 2. Check the available options
 
-./out -help
+./MrGBP -help
 
 3. run using coverage profile
 
-./out -fa /pathtofile/file.fa -covpm /pathtofile/cpm -covpstd /pathtofile/cpstd
+./MrGBP -fa /pathtofile/file.fa -covpm /pathtofile/cpm -covpstd /pathtofile/cpstd
+
 
 Codes for kmeans++ and dbsacan have been downloaded and modified to match our code:
 kmeans++: http://rosettacode.org/wiki/K-means%2B%2B_clustering
