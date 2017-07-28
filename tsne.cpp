@@ -88,7 +88,6 @@ void TSNE::run(double* X, int N, int D, double* Y, int no_dims, double perplexit
         if(X[i] > max_X) max_X = X[i];
     }
     for(int i = 0; i < N * D; i++) X[i] /= max_X;
-
     // Compute input similarities for exact t-SNE
     double* P; unsigned int* row_P; unsigned int* col_P; double* val_P;
     if(exact) {
@@ -129,7 +128,6 @@ void TSNE::run(double* X, int N, int D, double* Y, int no_dims, double perplexit
         for(int i = 0; i < row_P[N]; i++) val_P[i] /= sum_P;
     }
     end = clock();
-
     // Lie about the P-values
     if(exact) { for(int i = 0; i < N * N; i++)        P[i] *= 12.0; }
     else {      for(int i = 0; i < row_P[N]; i++) val_P[i] *= 12.0; }
@@ -143,31 +141,26 @@ void TSNE::run(double* X, int N, int D, double* Y, int no_dims, double perplexit
  //   if(exact) printf("Input similarities computed in %4.2f seconds!\nLearning embedding...\n", (float) (end - start) / CLOCKS_PER_SEC);
  //   else printf("Input similarities computed in %4.2f seconds (sparsity = %f)!\nLearning embedding...\n", (float) (end - start) / CLOCKS_PER_SEC, (double) row_P[N] / ((double) N * (double) N));
     start = clock();
-
 	for(int iter = 0; iter < max_iter; iter++) {
 
         // Compute (approximate) gradient
         if(exact) computeExactGradient(P, Y, N, no_dims, dY);
         else computeGradient(P, row_P, col_P, val_P, Y, N, no_dims, dY, theta);
-
         // Update gains
         for(int i = 0; i < N * no_dims; i++) gains[i] = (sign(dY[i]) != sign(uY[i])) ? (gains[i] + .2) : (gains[i] * .8);
         for(int i = 0; i < N * no_dims; i++) if(gains[i] < .01) gains[i] = .01;
-
         // Perform gradient update (with momentum and gains)
         for(int i = 0; i < N * no_dims; i++) uY[i] = momentum * uY[i] - eta * gains[i] * dY[i];
 		for(int i = 0; i < N * no_dims; i++)  Y[i] = Y[i] + uY[i];
 
         // Make solution zero-mean
 		zeroMean(Y, N, no_dims);
-
         // Stop lying about the P-values after a while, and switch momentum
         if(iter == stop_lying_iter) {
             if(exact) { for(int i = 0; i < N * N; i++)        P[i] /= 12.0; }
             else      { for(int i = 0; i < row_P[N]; i++) val_P[i] /= 12.0; }
         }
         if(iter == mom_switch_iter) momentum = final_momentum;
-
         // Print out progress
         if (iter > 0 && (iter % 50 == 0 || iter == max_iter - 1)) {
             end = clock();
@@ -712,7 +705,7 @@ void TSNE::save_data(double* data, int n, int d,std::string name) {
         {
             for (int j=0;j<d;j++)
                 myfile<< data[i*d+j]<<" ";
-          //  myfile<<id[i]<<" "<<lens[i];
+        //    myfile<<id[i]<<" "<<lens[i];
             myfile<<"\n";
         }
         myfile.close();

@@ -21,7 +21,7 @@ class feature_extraction
      std::map <float,int> phases;
 public:
     
-    void extract(std::string method,std::vector <float> *x,std::string xx,int dimx, int dimy,std::vector <std::vector <float>> *result,int coefn, std::vector <std::string> cp)
+    void extract(std::string method,std::vector <float> *x,std::string xx,int dimx, int dimy,std::vector <std::vector <float>> *result,int coefn, std::vector <std::string> cp,int len)
     {
         //feature extraction, other methods will be added
        if(method.compare("n_LBP")==0)
@@ -38,7 +38,7 @@ public:
         
             for (int i=0;i<cp.size();i++)
             {
-                r1.insert(r1.begin(),(std::stof(cp[i])));
+                r1.insert(r1.begin(),(std::stof(cp[i])/len));
             }
            
             result->push_back(r1);

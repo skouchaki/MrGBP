@@ -9,8 +9,6 @@
 // g++ *.cpp -Wno-return-type-c-linkage -I /usr/local/Cellar/eigen/3.2.8/include/eigen3/  -o a  -I /usr/local/include/ -lmgl -std=gnu++11
 //./a -fa /Users/samaneh/Downloads/bowtie2-2.2.9/refre/sorted_contigs.fa -covpm /Users/samaneh/Downloads/bowtie2-2.2.9/refre/coverage_profile  -covpstd /Users/samaneh/Downloads/bowtie2-2.2.9/refre/Coverage_std -outdir /Users/samaneh/Downloads/bowtie2-2.2.9/refre/sortedres
 
-
-#include <mgl2/mgl.h>
 #include <math.h>
 #include <iostream>
 #include <fstream>
@@ -29,6 +27,7 @@
 #include "kmeanspp.h"
 #include "dbscan.h"
 
+#include <mgl2/mgl.h>
 
 //saving BH-tSNe as .png file
 int sample(mglGraph *gr,double *a,int dim,std::vector <int> id,int k,int no_dims)
@@ -139,6 +138,7 @@ string find_infile(std::string file, std::string name,std::vector <std::string> 
     int flag=0;
     std::ifstream myfile (file.c_str());
     std::vector <std::string> record1;
+//std::cout<<name<<std::endl;
      while(getline( myfile, s ))
      {
          record1.clear();
@@ -149,12 +149,18 @@ string find_infile(std::string file, std::string name,std::vector <std::string> 
              if (!getline( ss, s, ' ' )) break;
              record1.push_back( s );
          }
+//std::cout<<"aa "<<record1[0]<<std::endl;
          if (name.compare(record1[0])==0)
          {
              flag=1;
              break;
          }
-         if (name.find(record1[0])!=std::string::npos && name[record1[0].size()]==' ')
+         else if (name.find(record1[0])!=std::string::npos && name[record1[0].size()]==' ')
+         {
+             flag=1;
+             break;
+         }
+	else if (name.find(record1[0])!=std::string::npos && name[record1[0].size()]=='\r')
          {
              flag=1;
              break;
@@ -166,6 +172,7 @@ string find_infile(std::string file, std::string name,std::vector <std::string> 
         {
             record->push_back("0");
         }
+	myfile.close();
         return "0";
     }
     else
@@ -175,15 +182,15 @@ string find_infile(std::string file, std::string name,std::vector <std::string> 
         {
             record->push_back(record1[i]);
         }
+	myfile.close();
         return record1[1];
     }
-    myfile.close();
 }
 
 int main(int argc, const char * argv[])
 {
-    int k=0;
- //   std::map<std::string, int> ids;
+    int k=1;
+  //  std::map<std::string, int> ids;
  //   std::vector <int> nnlen;
     
     std::string name;
@@ -306,6 +313,11 @@ int main(int argc, const char * argv[])
             no_dims=atoi(argv[iii + 1]);
             iii=iii+2;
         }
+	else if ((std::string)(argv[iii]) == "-mincl")//minimum contig length
+        {
+            no_dims=atoi(argv[iii + 1]);
+            iii=iii+2;
+        }
         
     }
     
@@ -330,9 +342,9 @@ int main(int argc, const char * argv[])
       //  std::size_t found1;
         std::vector <std::vector <float>> features;
         
-  //      int k = 1;
-  //      std::vector <int> id;
-  //      std::vector <int> lens;
+        int k = 1;
+      //  std::vector <int> id;
+      //  std::vector <int> lens;
         int *lenn=new int(0);
         
         //loop for extracting features
@@ -344,39 +356,40 @@ int main(int argc, const char * argv[])
         for (int i=0;i<ndata.size();i++) //for all the contigs
         {
             if(ndata[i].size()>=maxs)//only long contigs
-            {
-                
+            {        
+	//	lens.push_back(ndata[i].size());
                 ndata[i].erase(std::remove(ndata[i].begin(), ndata[i].end(), 'N'), ndata[i].end());
-            //    nnlen.push_back(ndata[i].size());
                 record.clear();
                 if(flag2==1)
                 {
+		//	std::cout<<cpname<<", "<<uids[i]<<std::endl;
                     find_infile(cpname, uids[i],&record);
                 }
                 if(flag3==1)
                 {
                     find_infile(cpname1, uids[i],&record);
                 }
+
                 rn->create_reps(ndata[i], &repsn,lenn,repsdim,repsmethod);
-                fe.extract(femethod, &repsn,ndata[i], lenn[0], repsdim, &features,lev,record);
+                fe.extract(femethod, &repsn,ndata[i], lenn[0], repsdim, &features,lev,record,ndata[i].size());
                 ndata[i]="";
                 repsn.clear();
-                record.clear();
                 
-    /*            record.clear();
-                std::string nn = find_infile("/Users/samaneh/Downloads/bowtie2-2.2.9/simulated_data/100s.spe.txt", uids[i],&record);
-                //for (int i=0;i<record.size();i++)
-            //    std::cout<<nn<<", "<<uids[i]<<std::endl;
-                //    std::cout<<std::endl;
-                //std::cout<<i<<std::endl;
-                if(ids.count(nn)==0)
-                {
-                    std::cout<<nn<<std::endl;
-                    ids[nn]=k;
-                    k++;
-                }
-                auto search = ids.find(nn);
-                id.push_back(search->second);*/
+                record.clear();
+	//	std::cout<<uids[i]<<std::endl;
+                std::string nn = find_infile("/local/engs1758/Downloads/100s/100s.spe.txt", uids[i],&record);
+     //           for (int i=0;i<record.size();i++)
+     //           std::cout<<nn<<", "<<uids[i]<<std::endl;
+     //               std::cout<<std::endl;
+             //   std::cout<<i<<std::endl;
+          //      if(ids.count(nn)==0)
+         //       {
+                //    std::cout<<nn<<std::endl;
+           //         ids[nn]=k;
+           //         k++;
+           //     }
+           //     auto search = ids.find(nn);
+           //     id.push_back(search->second);
                 
             }
         }
@@ -395,8 +408,7 @@ int main(int argc, const char * argv[])
         nnlen.clear();
         std::cout<<ids["0"]<<std::endl;*/
         
-        free(rn);
-        free(lenn);
+       // free(lenn);
         ndata.clear();
         uids.clear();
         std::vector <double> tmp;
@@ -406,7 +418,7 @@ int main(int argc, const char * argv[])
             std::ofstream myfile2 (out);
             if (myfile2.is_open())
             {
-                for (int i=0;i<features.size();i++)
+                for (int i=1;i<=features.size();i++)
                 {
                     tmp.clear();
                     copy((features[i]).begin(),(features[i]).end(),back_inserter(tmp));
@@ -453,7 +465,8 @@ int main(int argc, const char * argv[])
         
         t1=clock();
         tsne->run(data, dimx, dim, Y, no_dims, perplexity, theta,-1 , false);
-        tsne->save_data(Y, dimx, no_dims,out);
+	//std::cout<<"done"<<std::endl;        
+	tsne->save_data(Y, dimx, no_dims,out);
         std::cout<<"dimension reduction running time: "<<(float)(clock()-t1)/CLOCKS_PER_SEC<<std::endl;
         
         free(tsne);
