@@ -2,24 +2,27 @@ program name: MrGBP
 version: 1.0
 Developer: Samaneh Kouchaki (kouchaki.samaneh@gmail.com)
 
-
-========instalation guide
-(1) Install the following dependencies
+========dependencies
+Install the following dependencies
 
 eigen3: http://eigen.tuxfamily.org/index.php?title=Main_Page
 boost: http://www.boost.org/doc/libs/1_62_0/more/getting_started/unix-variants.html
 methgl: http://mathgl.sourceforge.net/doc_en/Installation.html
 
-(2) run: make
+for suggest using g++-4.8 or g++-4.9 
 
-(3) code is ready to use
+if you are installing dependencies locally please add the path to the makefile 
+========instalation guide
+
+(1) run: make
+ code is ready to use
 
 
 ========whtat does the code do:
 It is for binning metagenomic contigs.
 
 ========support platform
-MrGBP has been tested on Mac os but should run on linux platorm without any problem.
+MrGBP has been tested on both Mac and Linux platforms.
 
 
 ========run 
@@ -35,9 +38,9 @@ There is a number of options:
 
 -no_clust <num> : the number of clusters for kmeans++, default: 10
 
--covpm <num> : a file contains average coverage depth
+-covpm <num> : a file contains average coverage depth; the entries should be seprated by single space
 
--covpstd <num> : a file contains standard deviation coverage depth
+-covpstd <num> : a file contains standard deviation coverage depth; the entries should be seprated by single space
 
 -reps <method> : the numerical mapping including EIIP, Real, Integer, Paired, Atomic, default: Integer
 
