@@ -24,12 +24,13 @@ public:
         std::cout<<"-no_clust <num> : indicate the number of clusters for kmeans++, default: 10"<<std::endl;
         std::cout<<"-covpm <num> : indicate a file contains average coverage depth"<<std::endl;
         std::cout<<"-covpstd <num> : indicate a file contains standard deviation coverage depth"<<std::endl;
-        std::cout<<"-reps <method> : indicate the the numerical mapping including EIIP, Real, Integer, Paired, Atomic, default: EIIP"<<std::endl;
+        std::cout<<"-reps <method> : indicate the the numerical mapping including EIIP, Real, Integer, Paired, Atomic, default: Integer"<<std::endl;
         std::cout<<"-clust <method> : indicate the clustering method kmeans++ or dbscan: dbscan"<<std::endl;
         std::cout<<"-dbep <num> : indicate the epsilon for dbscan, default: 0.02"<<std::endl;
         std::cout<<"-dbminpt <num> : indicate the number of minimum neighbouring points for dbscan, default: 8"<<std::endl;
         std::cout<<"-save_feat : If the features needs to be saved separately"<<std::endl;
         std::cout<<"-no_dims : bh-tSNE dimensions, defualt: 2"<<std::endl;
+	std::cout<<"-mincl : minimum contigs length, defualt: 1000"<<std::endl;
     }
     
 };
